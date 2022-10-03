@@ -8,29 +8,27 @@ export const updatePersonalCode = (personalCode) => {
   personalCodeParagraph.innerHTML = personalCode;
 };
 
-export const updateLocalVideo = (stream) => {
-  const localVideo = document.getElementById("local_video");
-  localVideo.srcObject = stream;
+/////export const updateLocalVideo = (stream) => {
+/////  const localVideo = document.getElementById("local_video");
+/////  localVideo.srcObject = stream;
+/////
+/////  });
+/////};
 
-  localVideo.addEventListener("loadedmetadata", () => {
-    localVideo.play();
-  });
-};
+//export const showVideoCallButtons = () => {
+//  const personalCodeVideoButton = document.getElementById(
+//    "personal_code_video_button"
+//  );
+//  const strangerVideoButton = document.getElementById("stranger_video_button");
+//
+//  showElement(personalCodeVideoButton);
+//  showElement(strangerVideoButton);
+//};
 
-export const showVideoCallButtons = () => {
-  const personalCodeVideoButton = document.getElementById(
-    "personal_code_video_button"
-  );
-  const strangerVideoButton = document.getElementById("stranger_video_button");
-
-  showElement(personalCodeVideoButton);
-  showElement(strangerVideoButton);
-};
-
-export const updateRemoteVideo = (stream) => {
-  const remoteVideo = document.getElementById("remote_video");
-  remoteVideo.srcObject = stream;
-};
+///export const updateRemoteVideo = (stream) => {
+///  const remoteVideo = document.getElementById("remote_video");
+///  remoteVideo.srcObject = stream;
+///};
 
 export const showIncomingCallDialog = (
   callType,
@@ -61,6 +59,15 @@ export const showCallingDialog = (rejectCallHandler) => {
   dialog.querySelectorAll("*").forEach((dialog) => dialog.remove());
 
   dialog.appendChild(callingDialog);
+};
+
+export const updatestrangersnumbers = (data) => {
+  
+  var totalstrangers = document.getElementById('total-strangers');
+ 
+  totalstrangers.innerHTML=totalstrangers.innerHTML = data ;
+  
+
 };
 
 export const showNoStrangerAvailableDialog = () => {
@@ -99,7 +106,7 @@ export const showInfoDialog = (preOfferAnswer) => {
   if (preOfferAnswer === constants.preOfferAnswer.CALL_UNAVAILABLE) {
     infoDialog = elements.getInfoDialog(
       "Call is not possible",
-      "Probably callee is busy. Please try againg later"
+      "Probably callee is busy. Please try again later"
     );
   }
 
@@ -143,44 +150,49 @@ const showChatCallElements = () => {
   const newMessageInput = document.getElementById("new_message");
   showElement(newMessageInput);
   //block panel
-  disableDashboard();
+  showhangup();
+  hidestrangervideobtn();
+  showpositivealert();
+  changebackgroundimg();
+  
 };
 
 const showVideoCallElements = () => {
   const callButtons = document.getElementById("call_buttons");
   showElement(callButtons);
 
-  const placeholder = document.getElementById("video_placeholder");
-  hideElement(placeholder);
+  //const placeholder = document.getElementById("video_placeholder");
+  //hideElement(placeholder);
 
-  const remoteVideo = document.getElementById("remote_video");
-  showElement(remoteVideo);
+  //const remoteVideo = document.getElementById("remote_video");
+  //showElement(remoteVideo);
 
   const newMessageInput = document.getElementById("new_message");
   showElement(newMessageInput);
   //block panel
-  disableDashboard();
+  showhangup();
+  hidestrangervideobtn();
+  showpositivealert();
+  shownegativealert2();
+  changebackgroundimg();
 };
 
-// ui call buttons
 
-const micOnImgSrc = "./utils/images/mic.png";
-const micOffImgSrc = "./utils/images/micOff.png";
 
-export const updateMicButton = (micActive) => {
-  const micButtonImage = document.getElementById("mic_button_image");
-  micButtonImage.src = micActive ? micOffImgSrc : micOnImgSrc;
-};
-
-const cameraOnImgSrc = "./utils/images/camera.png";
-const cameraOffImgSrc = "./utils/images/cameraOff.png";
-
-export const updateCameraButton = (cameraActive) => {
-  const cameraButtonImage = document.getElementById("camera_button_image");
-  cameraButtonImage.src = cameraActive ? cameraOffImgSrc : cameraOnImgSrc;
-};
 
 // ui messages
+
+
+export const removeTypingDialog = () => {
+  const strangertyping = document.getElementById("stranger_typing");
+  strangertyping.style.display = "none";
+};
+
+export const typingMessage = () => {
+  const strangertyping = document.getElementById("stranger_typing");
+  strangertyping.style.display = "block";setTimeout(() => {removeTypingDialog();}, [3000])
+};
+
 export const appendMessage = (message, right = false) => {
   const messagesContainer = document.getElementById("messages_container");
   const messageElement = right
@@ -195,51 +207,30 @@ export const clearMessenger = () => {
 };
 
 // recording
-export const showRecordingPanel = () => {
-  const recordingButtons = document.getElementById("video_recording_buttons");
-  showElement(recordingButtons);
 
-  // hide start recording button if it is active
-  const startRecordingButton = document.getElementById(
-    "start_recording_button"
-  );
-  hideElement(startRecordingButton);
-};
 
-export const resetRecordingButtons = () => {
-  const startRecordingButton = document.getElementById(
-    "start_recording_button"
-  );
-  const recordingButtons = document.getElementById("video_recording_buttons");
 
-  hideElement(recordingButtons);
-  showElement(startRecordingButton);
-};
-
-export const switchRecordingButtons = (switchForResumeButton = false) => {
-  const resumeButton = document.getElementById("resume_recording_button");
-  const pauseButton = document.getElementById("pause_recording_button");
-
-  if (switchForResumeButton) {
-    hideElement(pauseButton);
-    showElement(resumeButton);
-  } else {
-    hideElement(resumeButton);
-    showElement(pauseButton);
-  }
-};
 
 // ui after hanged up
 export const updateUIAfterHangUp = (callType) => {
-  enableDashboard();
+  //enableDashboard();
 
   // hide the call buttons
   if (
     callType === constants.callType.VIDEO_PERSONAL_CODE ||
     callType === constants.callType.VIDEO_STRANGER
   ) {
-    const callButtons = document.getElementById("call_buttons");
-    hideElement(callButtons);
+    const hangupbtn = document.getElementById("hang_up_button");
+    hideElement(hangupbtn);
+    const strangervideobtn = document.getElementById("stranger_video_button");
+    showElement(strangervideobtn);
+    const strangerchatbtn = document.getElementById("stranger_chat_button");
+    showElement(strangerchatbtn);
+    const alertpositive = document.getElementById("alert_positive");
+    hideElement(alertpositive);
+    shownegativealert();
+    const messagescontainer = document.querySelector('.messages_container');
+    messagescontainer.style.backgroundImage = "url('css/mutedmike.jpg')";
   } else {
     const chatCallButtons = document.getElementById(
       "finish_chat_button_container"
@@ -247,22 +238,27 @@ export const updateUIAfterHangUp = (callType) => {
     hideElement(chatCallButtons);
   }
 
-  const newMessageInput = document.getElementById("new_message");
-  hideElement(newMessageInput);
+  //const newMessageInput = document.getElementById("new_message");
+  //hideElement(newMessageInput);
   clearMessenger();
+  
+  
+  
+  //const remoteVideo = document.getElementById("remote_video");
+  //showElement(remoteVideo);
 
-  updateMicButton(false);
-  updateCameraButton(false);
+  
 
   //hide remote video and show placeholder
-  const remoteVideo = document.getElementById("remote_video");
-  hideElement(remoteVideo);
+  
 
-  const placeholder = document.getElementById("video_placeholder");
-  showElement(placeholder);
-
+  //const placeholder = document.getElementById("video_placeholder");
+  //showElement(placeholder);
   removeAllDialogs();
+
 };
+
+
 
 // changing status of checkbox
 export const updateStrangerCheckbox = (allowConnections) => {
@@ -284,12 +280,57 @@ const enableDashboard = () => {
   }
 };
 
-const disableDashboard = () => {
-  const dashboardBlocker = document.getElementById("dashboard_blur");
-  if (dashboardBlocker.classList.contains("display_none")) {
-    dashboardBlocker.classList.remove("display_none");
-  }
+//const disableDashboard = () => {
+//  const dashboardBlocker = document.getElementById("dashboard_blur");
+//  if (dashboardBlocker.classList.contains("display_none")) {
+//    dashboardBlocker.classList.remove("display_none");
+//  }
+//};
+
+const showhangup = () => {
+  const hangupblocker = document.getElementById("hang_up_button");
+  if (hangupblocker.classList.contains("display_none")) {
+    hangupblocker.classList.remove("display_none");
+    }
 };
+
+const hidestrangervideobtn = () => {
+  const strangervideobtnblocker = document.getElementById("stranger_video_button");
+  if (!strangervideobtnblocker.classList.contains("display_none")) {
+    strangervideobtnblocker.classList.add("display_none");
+    }
+};
+
+ const showpositivealert = () => {
+  const alertpositive = document.getElementById("alert_positive");
+  if (alertpositive.classList.contains("display_none")) {
+    alertpositive.classList.remove("display_none");
+    }
+};
+
+
+ const shownegativealert = () => {
+  const alertnegative = document.getElementById("alert_disconnect");
+  if (alertnegative.classList.contains("display_none")) {
+    alertnegative.classList.remove("display_none");
+    }
+    
+};
+
+const shownegativealert2 = () => {
+  const alertnegative = document.getElementById("alert_disconnect");
+  if (!alertnegative.classList.contains("display_none")) {
+    alertnegative.classList.add("display_none");
+    }
+    
+};
+
+const changebackgroundimg = () => {
+
+  const messagescontainer = document.querySelector('.messages_container');
+  messagescontainer.style.backgroundImage = "url('css/finalmike.gif')";
+
+}
 
 const hideElement = (element) => {
   if (!element.classList.contains("display_none")) {

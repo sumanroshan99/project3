@@ -1,16 +1,16 @@
 import * as store from "./store.js";
-import * as wss from "./wss.js";
-import * as webRTCHandler from "./webRTCHandler.js";
+import * as chatwss from "./chatwss.js";
+import * as chatwebRTCHandler from "./chatwebRTCHandler.js";
+import * as chatstrangerUtils from "./chatstrangerUtils.js";
 import * as constants from "./constants.js";
 import * as ui from "./ui.js";
-import * as recordingUtils from "./recordingUtils.js";
-import * as strangerUtils from "./strangerUtils.js";
+
 
 // initialization of socketIO connection
 const socket = io("/");
-wss.registerSocketEvents(socket);
+chatwss.registerSocketEvents(socket);
 
-webRTCHandler.getLocalPreview();
+
 
 //register event listener for personal code copy button
 //const personalCodeCopyButton = document.getElementById(
@@ -37,7 +37,7 @@ personalCodeChatButton.addEventListener("click", () => {
   ).value;
   const callType = constants.callType.CHAT_PERSONAL_CODE;
 
-  webRTCHandler.sendPreOffer(callType, calleePersonalCode);
+  chatwebRTCHandler.sendPreOffer(callType, calleePersonalCode);
 });
 
 personalCodeVideoButton.addEventListener("click", () => {
@@ -46,22 +46,16 @@ personalCodeVideoButton.addEventListener("click", () => {
   ).value;
   const callType = constants.callType.VIDEO_PERSONAL_CODE;
 
-  webRTCHandler.sendPreOffer(callType, calleePersonalCode);
+  chatwebRTCHandler.sendPreOffer(callType, calleePersonalCode);
   
 });
 
 const strangerChatButton = document.getElementById("stranger_chat_button");
 strangerChatButton.addEventListener("click", () => {
-  strangerUtils.getStrangerSocketIdAndConnect(constants.callType.CHAT_STRANGER);
-  
+  chatstrangerUtils.getStrangerSocketIdAndConnect(constants.callType.CHAT_STRANGER);
 });
 
-const strangerVideoButton = document.getElementById("stranger_video_button");
-strangerVideoButton.addEventListener("click", () => {
-  strangerUtils.getStrangerSocketIdAndConnect(
-    constants.callType.VIDEO_STRANGER
-  ); 
-});
+
 
 
 function remainchecked()  {
@@ -69,7 +63,7 @@ function remainchecked()  {
   const checkboxState = store.getState().allowConnectionsFromStrangers;
   ui.updateStrangerCheckbox(!checkboxState);
   store.setAllowConnectionsFromStrangers(true);
-  strangerUtils.changeStrangerConnectionStatus(true);
+  chatstrangerUtils.changeStrangerConnectionStatus(true);
 };
 
 remainchecked();
@@ -80,42 +74,25 @@ remainchecked();
 //  const checkboxState = store.getState().allowConnectionsFromStrangers;
 //  ui.updateStrangerCheckbox(!checkboxState);
 //  store.setAllowConnectionsFromStrangers(!checkboxState);
-//  strangerUtils.changeStrangerConnectionStatus(!checkboxState);
+//  chatstrangerUtils.changeStrangerConnectionStatus(!checkboxState);
 //});
 
 // event listeners for video call buttons
 
 
-
-
-
-const switchForScreenSharingButton = document.getElementById(
-  "screen_sharing_button"
-);
-
-
-
 //switchForScreenSharingButton.addEventListener("click", () => {
 //  const screenSharingActive = store.getState().screenSharingActive;
-//  webRTCHandler.switchBetweenCameraAndScreenSharing(screenSharingActive);
+//  chatwebRTCHandler.switchBetweenCameraAndScreenSharing(screenSharingActive);
 //});
 
 // messenger
 
 const newMessageInput = document.getElementById("new_message_input");
-
-
-  
-
 newMessageInput.addEventListener("keydown", (event) => {
-  
-  wss.showtypingmessage();
-
   const key = event.key;
 
   if (key === "Enter") {
-    
-    webRTCHandler.sendMessageUsingDataChannel(event.target.value);
+    chatwebRTCHandler.sendMessageUsingDataChannel(event.target.value);
     ui.appendMessage(event.target.value, true);
     newMessageInput.value = "";
   }
@@ -124,7 +101,7 @@ newMessageInput.addEventListener("keydown", (event) => {
 const sendMessageButton = document.getElementById("send_message_button");
 sendMessageButton.addEventListener("click", () => {
   const message = newMessageInput.value;
-  webRTCHandler.sendMessageUsingDataChannel(message);
+  chatwebRTCHandler.sendMessageUsingDataChannel(message);
   ui.appendMessage(message, true);
   newMessageInput.value = "";
 });
@@ -161,8 +138,8 @@ sendMessageButton.addEventListener("click", () => {
 
 const hangUpButton = document.getElementById("hang_up_button");
 hangUpButton.addEventListener("click", () => {
-  
-  webRTCHandler.handleHangUp();
+ 
+  chatwebRTCHandler.handleHangUp();
  
 });
 
@@ -172,11 +149,11 @@ document.addEventListener('keydown', function(event){
 
     if (Stopbtn.classList.contains("display_none")) {
 
-      webRTCHandler.handleHangUp();
+      chatwebRTCHandler.handleHangUp();
       
        }
        else {
-        strangerUtils.getStrangerSocketIdAndConnect(
+        chatstrangerUtils.getStrangerSocketIdAndConnect(
           constants.callType.VIDEO_STRANGER
         ); 
        }
@@ -190,7 +167,7 @@ document.addEventListener('keydown', function(event){
 
 //const hangUpChatButton = document.getElementById("finish_chat_call_button");
 //hangUpChatButton.addEventListener("click", () => {
-//  webRTCHandler.handleHangUp();
+//  chatwebRTCHandler.handleHangUp();
 //});
 
 

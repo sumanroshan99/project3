@@ -129,9 +129,14 @@ export const getInfoDialog = (dialogTitle, dialogDescription) => {
 export const getLeftMessage = (message) => {
   const messageContainer = document.createElement("div");
   messageContainer.classList.add("message_left_container");
-  const messageParagraph = document.createElement("p");
+  const messageParagraph = document.createElement("div");
   messageParagraph.classList.add("message_left_paragraph");
+  const headingParagraph = document.createElement("div");
+  headingParagraph.classList.add("message_left_heading");
+  headingParagraph.innerHTML="Stranger:&ensp;";
   messageParagraph.innerHTML = message;
+  headingParagraph.innerHTML="Stranger:";
+  messageContainer.appendChild(headingParagraph);
   messageContainer.appendChild(messageParagraph);
 
   return messageContainer;
@@ -140,10 +145,14 @@ export const getLeftMessage = (message) => {
 export const getRightMessage = (message) => {
   const messageContainer = document.createElement("div");
   messageContainer.classList.add("message_right_container");
-  const messageParagraph = document.createElement("p");
+  const messageParagraph = document.createElement("div");
+  const headingParagraph = document.createElement("div");
   messageParagraph.classList.add("message_right_paragraph");
+  headingParagraph.classList.add("message_right_heading");
   messageParagraph.innerHTML = message;
+  headingParagraph.innerHTML="Me:";
+  messageContainer.appendChild(headingParagraph);
   messageContainer.appendChild(messageParagraph);
-
+ 
   return messageContainer;
 };

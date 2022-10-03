@@ -16,9 +16,16 @@ app.get("/", (req, res) => {
 let connectedPeers = [];
 let connectedPeersStrangers = [];
 
-io.on("connection", (socket) => {
-  connectedPeers.push(socket.id);
 
+
+io.on("connection", (socket) => {
+
+  var totalstrangers = socket.client.conn.server.clientsCount;
+  //console.log( totalstrangers + " users connected" );
+  io.emit("total-strangers",totalstrangers);
+
+  connectedPeers.push(socket.id);
+ // console.log(connectedPeers.length);
   socket.on("pre-offer", (data) => {
     const { calleePersonalCode, callType } = data;
     const connectedPeer = connectedPeers.find(
@@ -73,34 +80,52 @@ io.on("connection", (socket) => {
     if (connectedPeer) {
       io.to(connectedUserSocketId).emit("user-hanged-up");
     }
+
   });
 
   socket.on("stranger-connection-status", (data) => {
     const { status } = data;
     if (status) {
       connectedPeersStrangers.push(socket.id);
+      
     } else {
       const newConnectedPeersStrangers = connectedPeersStrangers.filter(
         (peerSocketId) => peerSocketId !== socket.id
       );
       connectedPeersStrangers = newConnectedPeersStrangers;
+     
+      //var totalstrangers = connectedPeersStrangers.length;
+      //console.log(connectedPeersStrangers.length);
+     
     }
   });
 
-  socket.on("get-stranger-socket-id", () => {
-    let randomStrangerSocketId;
-    const filteredConnectedPeersStrangers = connectedPeersStrangers.filter(
-      (peerSocketId) => peerSocketId !== socket.id
-    );
 
+  socket.on("show-typing-message", () => {
+
+    
+    
+    io.emit("show-typing-message-now");
+
+  });
+
+    socket.on("get-stranger-socket-id", () => {
+      
+         let randomStrangerSocketId;
+         const filteredConnectedPeersStrangers = connectedPeersStrangers.filter(
+         (peerSocketId) => peerSocketId !== socket.id
+        
+    );    
+             
     if (filteredConnectedPeersStrangers.length > 0) {
-      randomStrangerSocketId =
-        filteredConnectedPeersStrangers[
-          Math.floor(Math.random() * filteredConnectedPeersStrangers.length)
-        ];
-    } else {
-      randomStrangerSocketId = null;
-    }
+         randomStrangerSocketId =
+         filteredConnectedPeersStrangers[
+         Math.floor(Math.random() * filteredConnectedPeersStrangers.length)
+         ];
+         
+       }else {
+         randomStrangerSocketId = null;
+       }
 
     const data = {
       randomStrangerSocketId,

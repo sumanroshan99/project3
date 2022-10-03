@@ -1,8 +1,8 @@
 import * as store from "./store.js";
 import * as ui from "./ui.js";
-import * as webRTCHandler from "./webRTCHandler.js";
+import * as chatwebRTCHandler from "./chatwebRTCHandler.js";
+import * as chatstrangerUtils from "./chatstrangerUtils.js";
 import * as constants from "./constants.js";
-import * as strangerUtils from "./strangerUtils.js";
 
 let socketIO = null;
 
@@ -15,33 +15,34 @@ export const registerSocketEvents = (socket) => {
   });
 
   socket.on("pre-offer", (data) => {
-    webRTCHandler.handlePreOffer(data);
+    
+    chatwebRTCHandler.handlePreOffer(data);
+    
   });
 
   socket.on("pre-offer-answer", (data) => {
-    webRTCHandler.handlePreOfferAnswer(data);
+    chatwebRTCHandler.handlePreOfferAnswer(data);
   });
 
   socket.on("user-hanged-up", () => {
-    webRTCHandler.handleConnectedUserHangedUp();
+    chatwebRTCHandler.handleConnectedUserHangedUp();
   });
 
   socket.on("total-strangers", (data) => {
-    console.log('total no of strangers');
-    console.log(data);
+    
     ui.updatestrangersnumbers(data);
   });
 
   socket.on("webRTC-signaling", (data) => {
     switch (data.type) {
       case constants.webRTCSignaling.OFFER:
-        webRTCHandler.handleWebRTCOffer(data);
+        chatwebRTCHandler.handleWebRTCOffer(data);
         break;
       case constants.webRTCSignaling.ANSWER:
-        webRTCHandler.handleWebRTCAnswer(data);
+        chatwebRTCHandler.handleWebRTCAnswer(data);
         break;
       case constants.webRTCSignaling.ICE_CANDIDATE:
-        webRTCHandler.handleWebRTCCandidate(data);
+        chatwebRTCHandler.handleWebRTCCandidate(data);
         break;
       default:
         return;
@@ -49,21 +50,13 @@ export const registerSocketEvents = (socket) => {
   });
 
   socket.on("stranger-socket-id", (data) => {
-    strangerUtils.connectWithStranger(data);
-    console.log(data);
+    console.log('coming 1');
+    chatstrangerUtils.connectWithStranger(data);
   });
-
   socket.on("total-strangers",(totalstrangers)=>{
 
-    console.log("total strangers")
-    console.log(totalstrangers);
+   
     ui.updatestrangersnumbers(totalstrangers);
-
-  });
-
-  socket.on("show-typing-message-now",()=>{
-    console.log("typing...");
-    ui.typingMessage();
 
   });
   
@@ -71,8 +64,9 @@ export const registerSocketEvents = (socket) => {
 };
 
 export const sendPreOffer = (data) => {
+  console.log("coming 3 at wss");
   socketIO.emit("pre-offer", data);
-  
+
 };
 
 export const sendPreOfferAnswer = (data) => {
@@ -93,8 +87,4 @@ export const changeStrangerConnectionStatus = (data) => {
 
 export const getStrangerSocketId = () => {
   socketIO.emit("get-stranger-socket-id");
-};
-
-export const showtypingmessage = () => {
-  socketIO.emit("show-typing-message");
 };

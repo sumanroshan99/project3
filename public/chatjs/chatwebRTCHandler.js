@@ -1,8 +1,8 @@
-import * as wss from "./wss.js";
+import * as chatwss from "./chatwss.js";
 import * as constants from "./constants.js";
 import * as ui from "./ui.js";
 import * as store from "./store.js";
-import * as strangerUtils from "./strangerUtils.js";
+
 
 let connectedUserDetails;
 let peerConection;
@@ -25,8 +25,8 @@ export const getLocalPreview = () => {
   navigator.mediaDevices
     .getUserMedia(defaultConstraints)
     .then((stream) => {
-      //ui.updateLocalVideo(stream);
-      //ui.showVideoCallButtons();
+      ui.updateLocalVideo(stream);
+      ui.showVideoCallButtons();
       store.setCallState(constants.callState.CALL_AVAILABLE);
       store.setLocalStream(stream);
     })
@@ -43,11 +43,8 @@ const createPeerConnection = () => {
   peerConection = new RTCPeerConnection(configuration);
 
   dataChannel = peerConection.createDataChannel("chat");
-  
-  
 
   peerConection.ondatachannel = (event) => {
-
     const dataChannel = event.channel;
 
     dataChannel.onopen = () => {
@@ -55,7 +52,6 @@ const createPeerConnection = () => {
     };
 
     dataChannel.onmessage = (event) => {
-
       const message = JSON.parse(event.data);
       ui.appendMessage(message);
     };
@@ -64,7 +60,7 @@ const createPeerConnection = () => {
   peerConection.onicecandidate = (event) => {
     if (event.candidate) {
       // send our ice candidates to other peer
-      wss.sendDataUsingWebRTCSignaling({
+      chatwss.sendDataUsingWebRTCSignaling({
         connectedUserSocketId: connectedUserDetails.socketId,
         type: constants.webRTCSignaling.ICE_CANDIDATE,
         candidate: event.candidate,
@@ -80,7 +76,7 @@ const createPeerConnection = () => {
   // receiving tracks
   const remoteStream = new MediaStream();
   store.setRemoteStream(remoteStream);
-  //ui.updateRemoteVideo(remoteStream);
+  ui.updateRemoteVideo(remoteStream);
 
   peerConection.ontrack = (event) => {
     remoteStream.addTrack(event.track);
@@ -99,12 +95,6 @@ const createPeerConnection = () => {
     }
   }
 };
-
-export const sendMessageTypingUsingDataChannel = () => {
-  
-  dataChannel.showtypingmessage();
-};
-
 
 export const sendMessageUsingDataChannel = (message) => {
   const stringifiedMessage = JSON.stringify(message);
@@ -127,7 +117,7 @@ export const sendPreOffer = (callType, calleePersonalCode) => {
     };
     ui.showCallingDialog(callingDialogRejectCallHandler);
     store.setCallState(constants.callState.CALL_UNAVAILABLE);
-    wss.sendPreOffer(data);
+    chatwss.sendPreOffer(data);
   }
 
   if (
@@ -139,7 +129,7 @@ export const sendPreOffer = (callType, calleePersonalCode) => {
       calleePersonalCode,
     };
     store.setCallState(constants.callState.CALL_UNAVAILABLE);
-    wss.sendPreOffer(data);
+    chatwss.sendPreOffer(data);
   }
 };
 
@@ -196,7 +186,7 @@ const callingDialogRejectCallHandler = () => {
   };
   closePeerConnectionAndResetState();
 
-  wss.sendUserHangedUp(data);
+  chatwss.sendUserHangedUp(data);
 };
 
 const sendPreOfferAnswer = (preOfferAnswer, callerSocketId = null) => {
@@ -208,7 +198,7 @@ const sendPreOfferAnswer = (preOfferAnswer, callerSocketId = null) => {
     preOfferAnswer,
   };
   ui.removeAllDialogs();
-  wss.sendPreOfferAnswer(data);
+  chatwss.sendPreOfferAnswer(data);
 };
 
 export const handlePreOfferAnswer = (data) => {
@@ -244,7 +234,7 @@ export const handlePreOfferAnswer = (data) => {
 const sendWebRTCOffer = async () => {
   const offer = await peerConection.createOffer();
   await peerConection.setLocalDescription(offer);
-  wss.sendDataUsingWebRTCSignaling({
+  chatwss.sendDataUsingWebRTCSignaling({
     connectedUserSocketId: connectedUserDetails.socketId,
     type: constants.webRTCSignaling.OFFER,
     offer: offer,
@@ -255,7 +245,7 @@ export const handleWebRTCOffer = async (data) => {
   await peerConection.setRemoteDescription(data.offer);
   const answer = await peerConection.createAnswer();
   await peerConection.setLocalDescription(answer);
-  wss.sendDataUsingWebRTCSignaling({
+  chatwss.sendDataUsingWebRTCSignaling({
     connectedUserSocketId: connectedUserDetails.socketId,
     type: constants.webRTCSignaling.ANSWER,
     answer: answer,
@@ -344,7 +334,7 @@ export const handleHangUp = () => {
   };
 
   
-  wss.sendUserHangedUp(data);
+  chatwss.sendUserHangedUp(data);
   closePeerConnectionAndResetState();
 };
 
@@ -356,10 +346,8 @@ export const handleConnectedUserHangedUp = () => {
 
 const closePeerConnectionAndResetState = () => {
   if (peerConection) {
-    
     peerConection.close();
     peerConection = null;
-    
   }
 
   // active mic and camera
@@ -367,7 +355,7 @@ const closePeerConnectionAndResetState = () => {
     connectedUserDetails.callType === constants.callType.VIDEO_PERSONAL_CODE ||
     connectedUserDetails.callType === constants.callType.VIDEO_STRANGER
   ) {
-    //store.getState().localStream.getVideoTracks()[0].enabled = true;
+    store.getState().localStream.getVideoTracks()[0].enabled = true;
     store.getState().localStream.getAudioTracks()[0].enabled = true;
   }
 
@@ -403,8 +391,4 @@ const setIncomingCallsAvailable = () => {
   }
 };
 
-export const showtypingmessage = () => {
 
-  console.log("typing...");
-
-};
